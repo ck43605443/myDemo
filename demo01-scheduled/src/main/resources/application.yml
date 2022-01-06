@@ -1,0 +1,10 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: demo01-scheduled
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://82.157.70.102:33066/db_irnp_mjl?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&useSSL=false
+    username: root
+    password: root

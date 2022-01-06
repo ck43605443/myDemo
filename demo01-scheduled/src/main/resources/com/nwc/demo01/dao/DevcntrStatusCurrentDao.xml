@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nwc.demo01.dao.DevcntrStatusCurrentDao">
+    <resultMap id="devcntrMap" type="com.nwc.demo01.pojo.DevcntrStatusCurrent">
+        <id column="device_id" property="deviceId" jdbcType="INTEGER"/>
+        <id column="unit_id" property="unitId" jdbcType="INTEGER"/>
+        <result column="device_type" property="deviceType" jdbcType="INTEGER"/>
+        <result column="device_status" property="deviceStatus" jdbcType="INTEGER"/>
+        <result column="device_data" property="deviceData" jdbcType="LONGVARCHAR"/>
+        <result column="data_tag" property="dataTag" jdbcType="INTEGER"/>
+        <result column="last_time" property="lastTime" jdbcType="TIMESTAMP"/>
+        <result column="refresh_tag" property="refreshTag" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="RptcntrTrafficMap" type="com.nwc.demo01.pojo.RptcntrTrafficMinuteOrHour">
+        <id column="unit_id" property="unitId" jdbcType="INTEGER"/>
+        <result column="time_year" property="timeYear" jdbcType="INTEGER"/>
+        <result column="time_month" property="timeMonth" jdbcType="INTEGER"/>
+        <result column="time_day" property="timeDay" jdbcType="INTEGER"/>
+        <result column="time_hour" property="timeHour" jdbcType="INTEGER"/>
+        <result column="time_minute" property="timeHour" jdbcType="INTEGER"/>
+        <result column="device_id" property="deviceId" jdbcType="INTEGER"/>
+        <result column="lane_id" property="laneId" jdbcType="INTEGER"/>
+        <result column="vehicle_type" property="vehicleType" jdbcType="INTEGER"/>
+        <result column="direction" property="direction" jdbcType="INTEGER"/>
+        <result column="vehicle_volume" property="vehicleVolume" jdbcType="INTEGER"/>
+        <result column="vehicle_length" property="vehicleLength" jdbcType="INTEGER"/>
+        <result column="vehicle_density" property="vehicleDensity" jdbcType="INTEGER"/>
+        <result column="average_scale" property="averageScale" jdbcType="INTEGER"/>
+        <result column="occupancy_ratio" property="occupancyRatio" jdbcType="DOUBLE"/>
+        <result column="distance_headway" property="distanceHeadway" jdbcType="DOUBLE"/>
+        <result column="average_speed" property="averageSpeed" jdbcType="DOUBLE"/>
+    </resultMap>
+    <!--        SELECT * FROM devcntr_status_current t WHERE t.last_time IS NOT NULL AND t.last_time>DATE_ADD(NOW(), INTERVAL -5 MINUTE) AND t.device_type=101-->
+    <select id="findBy5min" resultMap="devcntrMap">
+        SELECT *
+        FROM devcntr_status_current t
+        WHERE t.last_time IS NOT NULL
+          AND t.last_time > DATE_ADD(NOW(), INTERVAL -5 MINUTE)
+          AND t.device_type = 101
+    </select>
+
+    <insert id="saveRptcntrTrafficMinute">
+            INSERT IGNORE INTO rptcntr_traffic_minute
+            (unit_id,device_id,time_year,time_month,time_day,time_hour,time_minute,direction,lane_id,vehicle_type,vehicle_volume,vehicle_length,vehicle_density,average_scale,occupancy_ratio,distance_headway,average_speed)
+            values
+        <foreach item="item" collection="minuteList">
+            (${item.unitId},
+            ${item.deviceId},
+            ${item.timeYear},
+            ${item.timeMonth},
+            ${item.timeDay},
+            ${item.timeHour},
+            ${item.timeMinute},
+            ${item.direction},
+            ${item.laneId},
+            ${item.vehicleType},
+            ${item.vehicleVolume},
+            ${item.vehicleLength},
+            ${item.vehicleDensity},
+            ${item.averageScale},
+            ${item.occupancyRatio},
+            ${item.distanceHeadway},
+            ${item.averageSpeed}
+            );
+        </foreach>
+    </insert>
+    <insert id="saveRptcntrTrafficHour">
+        <foreach item="item" collection="hourList">
+            insert into rptcntr_traffic_hour
+            (unit_id,device_id,time_year,time_month,time_day,time_hour,direction,lane_id,vehicle_type,vehicle_volume,vehicle_length,vehicle_density,average_scale,occupancy_ratio,distance_headway,average_speed)
+            values
+            (${item.unitId},
+            ${item.deviceId},
+            ${item.timeYear},
+            ${item.timeMonth},
+            ${item.timeDay},
+            ${item.timeHour},
+            ${item.direction},
+            ${item.laneId},
+            ${item.vehicleType},
+            ${item.vehicleVolume},
+            ${item.vehicleLength},
+            ${item.vehicleDensity},
+            ${item.averageScale},
+            ${item.occupancyRatio},
+            ${item.distanceHeadway},
+            ${item.averageSpeed}
+            );
+        </foreach>
+    </insert>
+
+    <select id="findBy1hour" resultMap="RptcntrTrafficMap">
+        select unit_id,
+               device_id,
+               lane_id,
+               vehicle_type,
+               time_year,
+               time_month,
+               time_day,
+               time_hour,
+               SUM(direction) as direction ,
+               SUM(vehicle_volume) as vehicle_volume,
+               SUM(vehicle_length) as vehicle_length,
+               SUM(vehicle_density) as vehicle_density,
+               SUM(average_scale) as average_scale,
+               SUM(occupancy_ratio) as occupancy_ratio,
+               SUM(distance_headway) as distance_headway,
+               AVG(average_speed) as average_speed
+        from rptcntr_traffic_minute
+        where time_year = ${year}
+          and time_month = ${month}
+          and time_day = ${day}
+          and time_hour = ${hour}
+        GROUP BY device_id, unit_id, lane_id, vehicle_type
+    </select>
+</mapper>
