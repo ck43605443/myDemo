@@ -1,14 +1,17 @@
 server:
-  port: 8081
+  port: 8088
 spring:
   application:
-    name: demo01-scheduled
+    name: demo02-xxljob
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://82.157.70.102:33066/db_irnp_mjl?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&useSSL=false
     username: root
     password: root
-  cloud:
-      nacos:
-        discovery:
-          server-addr: 82.157.70.102:8848
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8080/xxl-job-admin
+    executor:
+      appname: ${spring.application.name}-executor
+      port: 9991

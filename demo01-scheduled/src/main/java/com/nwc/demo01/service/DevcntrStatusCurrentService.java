@@ -13,7 +13,7 @@ public interface DevcntrStatusCurrentService {
 
     void saveRptcntrTrafficMinute(List<RptcntrTrafficMinuteOrHour> minuteList);
 
-    List<RptcntrTrafficMinuteOrHour> findBy1hour();
+    List<RptcntrTrafficMinuteOrHour> findBy1hour(String language);
 
     void saveRptcntrTrafficHour(List<RptcntrTrafficMinuteOrHour> list);
 }

@@ -1,2 +1,4 @@
 # 项目排除路径
 /demo01-scheduled/target/
+.idea/
+*.iml

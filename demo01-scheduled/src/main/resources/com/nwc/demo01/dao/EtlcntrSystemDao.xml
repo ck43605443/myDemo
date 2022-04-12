@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.nwc.demo01.dao.DevcntrStatusCurrentDao">
+<mapper namespace="com.nwc.demo01.dao.EtlcntrSystemDao">
     <resultMap id="devcntrMap" type="com.nwc.demo01.pojo.DevcntrStatusCurrent">
         <id column="device_id" property="deviceId" jdbcType="INTEGER"/>
         <id column="unit_id" property="unitId" jdbcType="INTEGER"/>
@@ -37,7 +37,7 @@
         SELECT *
         FROM devcntr_status_current t
         WHERE t.last_time IS NOT NULL
-          AND t.last_time > DATE_ADD(NOW(), INTERVAL -5 MINUTE)
+          AND t.last_time > DATE_ADD(NOW(), INTERVAL -1 year)
           AND t.device_type = 101
     </select>
 
@@ -108,7 +108,16 @@
                SUM(occupancy_ratio) as occupancy_ratio,
                SUM(distance_headway) as distance_headway,
                AVG(average_speed) as average_speed
-        from rptcntr_traffic_minute
+        from
+             <if test="language=='zh-CN' or language==null">
+                 rptcntr_traffic_minute
+             </if>
+          <if test="language=='en-US'">
+                 rptcntr_traffic_minute_en
+             </if>
+          <if test="language=='bn-BD'">
+                 rptcntr_traffic_minute_bn
+             </if>
         where time_year = ${year}
           and time_month = ${month}
           and time_day = ${day}

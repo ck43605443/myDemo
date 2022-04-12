@@ -10,6 +10,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>demo01-scheduled</module>
+        <module>demo02-xxljob</module>
+        <module>demo03-divTask</module>
+        <module>demo04-es</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

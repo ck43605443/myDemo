@@ -1,20 +1,15 @@
 package com.nwc.demo01.service;
 
-import com.nwc.demo01.dao.DevcntrStatusCurrentDao;
+import com.nwc.demo01.dao.EtlcntrSystemDao;
 import com.nwc.demo01.pojo.DevcntrStatusCurrent;
 import com.nwc.demo01.pojo.RptcntrTrafficMinuteOrHour;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +19,7 @@ import java.util.List;
 @Service
 public class DevcntrStatusCurrentServiceImpl implements DevcntrStatusCurrentService {
     @Autowired
-    private DevcntrStatusCurrentDao devcntrStatusCurrentDao;
+    private EtlcntrSystemDao devcntrStatusCurrentDao;
 
 
     @Override
@@ -51,9 +46,10 @@ public class DevcntrStatusCurrentServiceImpl implements DevcntrStatusCurrentServ
     }
 
     @Override
-    public List<RptcntrTrafficMinuteOrHour> findBy1hour() {
+    public List<RptcntrTrafficMinuteOrHour> findBy1hour(String language) {
         DateTime time = DateTime.now().minusHours(1);//当前时间减一小时
-        return devcntrStatusCurrentDao.findBy1hour(time.getYear(), time.getMonthOfYear(), time.getDayOfMonth(), time.getHourOfDay());
+//        DateTime time = DateTime.now().minusDays(5);
+        return devcntrStatusCurrentDao.findBy1hour(time.getYear(), time.getMonthOfYear(), time.getDayOfMonth(), time.getHourOfDay(),language);
     }
 
     @Override
@@ -80,6 +76,7 @@ public class DevcntrStatusCurrentServiceImpl implements DevcntrStatusCurrentServ
                                 int type = Integer.parseInt(element1.getName().substring(4));
                                 RptcntrTrafficMinuteOrHour.setVehicleType(type);
                                 if (typeElement.getName().equals("VEHICLE_RATE")) {
+                                    typeElement.setText("123");
                                     RptcntrTrafficMinuteOrHour.setAverageSpeed(Double.parseDouble(typeElement.getText()));
                                 }
                                 if (typeElement.getName().equals("POSSESS_RATE")) {
@@ -109,7 +106,7 @@ public class DevcntrStatusCurrentServiceImpl implements DevcntrStatusCurrentServ
                         }
                     }
                 }
-
+                System.out.println(document.asXML());
             } catch (Exception e) {
                 e.printStackTrace();
             }
